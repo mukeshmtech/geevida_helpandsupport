@@ -1,6 +1,7 @@
 <?php
 
 require "UserClass.php";
+require "AdClass.php";
 
 // Get the HTTP method and request path
 header('Content-Type: application/json');
@@ -16,6 +17,9 @@ else if($endpointName == "statesListAPi" && $method=="GET"){
 }
 else if($endpointName == "userRegisterApi" && $method=="POST"){
     userRegisterApi();
+}
+else if($endpointName == "userPostTicketApi" && $method=="POST"){
+    userPostTicketApi();
 }
 else
 {
@@ -89,6 +93,39 @@ function userRegisterApi(){
     }
 
     $response = ['status' => $status, 'data' => $result, 'message' => $responseMessage];
+    echo json_encode($response);
+    exit;
+}
+
+function userPostTicketApi() {
+
+
+    if(!isset($_POST['user_id']) || empty($_POST['user_id']) || !isset($_POST['tic_subject']) || empty($_POST['tic_subject']) || !isset($_POST['tic_content']) || empty($_POST['tic_content'])){
+
+        $response = ['status' => false, 'data' => [], 'message' => 'Invalid data'];
+        echo json_encode($response);
+        exit;
+    }
+
+    $postClass=new AdClass();
+
+    if(!empty($_FILES['additonal_file']))
+    {
+        $add_file = $_FILES['additonal_file']; 
+        $filename1= date('Ymdhsi').'user'.$_POST['user_id'];
+
+        $adfileName = $add_file['name']; $adTempName = $add_file['tmp_name'];
+        $exp = explode('.', $adfileName);
+        $ext = end($exp);
+        $filename = $filename1.'.'.$ext;
+            
+        if(move_uploaded_file($adTempName, '../uploads/'.$filename))
+        {
+            $result = $postClass->creatTicket($_POST['user_id'],$_POST['tic_subject'],$_POST['tic_content'],$filename);
+        }
+    }	
+
+    $response = ['status' => true, 'data' => $result, 'message' => "Ticket Added"];
     echo json_encode($response);
     exit;
 }

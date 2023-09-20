@@ -20,7 +20,10 @@
                   <!-- menu links -->
                   <ul class="menu-links">
                      <li>
-                        <a href="post-ad.php"><i class="fa fa-plus-square " aria-hidden="true"> </i>Post support </a>
+                        <a href="create-your-ticker.php"><i class="fa fa-plus-square " aria-hidden="true"> </i>Create your ticket </a>
+                     </li>
+                     <li>
+                        <a href="view-your-ticker.php"><i class="fa fa-eye " aria-hidden="true"> </i>View your ticket </a>
                      </li>
                      <li>
                         <a href="javascript:void(0)"><img class="img-circle resize" alt="" src="images/users/3.jpg"> <span class="myname"> <?php echo $_SESSION['UserName']; ?> </span> <span class="caret"></span></a>

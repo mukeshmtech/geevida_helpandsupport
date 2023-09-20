@@ -40,7 +40,16 @@ $(document).ready(function(){
         };
     }, "Password does not satisfy below conditions");
 
-    //********** Login Form Validation **********//
+
+    // Add a custom validation method for file size
+    $.validator.addMethod("filesize", function (value, element, param) {
+        if (element.files[0]) {
+          return this.optional(element) || (element.files[0].size <= param * 1024);
+        }
+        return true;
+      }, "File size must be less than {0} KB.");
+
+    //********** Login Form Validation **********/
 
     $("#ghs_loginForm").validate({
 
@@ -56,7 +65,6 @@ $(document).ready(function(){
             userpass: {
                 required: true
             },
-        
         },
         messages: {
             usermail: {
@@ -65,7 +73,6 @@ $(document).ready(function(){
             userpass: {
                 required: "Password is required",
             },
-            
         },
         invalidHandler: function(form, validator) {
             if (!validator.numberOfInvalids())
@@ -152,6 +159,49 @@ $(document).ready(function(){
                 scrollTop: jQuery(validator.errorList[0].element).offset().top - 70
             }, 1000);
         }
-    });	
+    });
+
+    //********** Submit Ticket Form Validation **********//
+
+    $("#submit-ticket-form").validate({
+
+        errorPlacement: function errorPlacement(error, element) { element.before(error); },
+
+        ignore: ".ignore",
+        focusInvalid: false,
+
+        rules: {
+            tic_subject: {
+                required: true
+            },
+            tic_content: {
+                required: true
+            },
+            additonal_file:{
+                extension: "jpg|jpeg|png|pdf|docx",
+                filesize: 500  // 500KB
+            }
+        },
+        messages: {
+            tic_subject: {
+                required: "Subject is required",
+            },
+            tic_content: {
+                required: "Ticket content is required", 
+            },
+            additonal_file:{
+                extension: "Invalid file type. Please select a valid image file (JPG, JPEG, PNG, PDF, DOCX).",
+                filesize: "File size exceeds the maximum limit (500KB). Please choose a smaller file."
+            },
+        },
+        invalidHandler: function(form, validator) {
+            if (!validator.numberOfInvalids())
+                return;
+
+            jQuery('html, body').animate({
+                scrollTop: jQuery(validator.errorList[0].element).offset().top - 70
+            }, 1000);
+        }
+    });
 
 });

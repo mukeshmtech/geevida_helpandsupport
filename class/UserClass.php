@@ -82,8 +82,6 @@ class UserClass extends DBController{
 			$res=0;
 		}
 
-		// echo "session_id".$_SESSION['UserId'];
-		
 		return $res;
 	}
 

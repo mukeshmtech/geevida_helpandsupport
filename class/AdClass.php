@@ -9,51 +9,28 @@ class AdClass extends DBController{
 		$this->conn = new DBController();
 	}
 
-	public function postAd(){
-		$photo = $_FILES['phtos']; $cnt = count($photo['name']); $filename1= date('Ymdhsi').'user'.$_SESSION['UserId']; $photos = '';
-		$extension = array('jpeg' ,'jpg', 'png' ); $arr = array();
-
-		for ($i=0; $i < $cnt; $i++) { 
-			$imgName = $photo['name'][$i]; $imgTempName = $photo['tmp_name'][$i]; $imgSize = $photo['size'][$i]; $imgType = $photo['type'][$i];
-			$exp = explode('.', $imgName);
-			$ext = end($exp);
-			$filename = $filename1.'img'.$i.'.'.$ext;
-			if(in_array(strtolower($ext), $extension) === false){
-				$_SESSION['status']= 'Failed';
-				$_SESSION['msg']   = 'Please upload .jpg or .png file..';
-				$arr['location']   = 'post-ad.php'; $i = $cnt; $photos ='0';
-			} 
-			elseif($imgSize > 2097152){
-				$_SESSION['status']= 'Failed';
-				$_SESSION['msg']   = 'Image size must be lessthen 2MB..';
-				$arr['location']   = 'post-ad.php'; $i = $cnt; $photos ='0';
-			} 
-			else{
-				move_uploaded_file($imgTempName, 'uploads/'.$filename);
-				$photos .= $filename.',';
-			}
-		}
-		$photos = rtrim($photos, ",");
+	public function creatTicket($user_id,$tic_subject,$tic_content,$additonal_file=""){
 		
-		if($photos != '0'){
-			$data = $this->conn->filterPost(); 
-			$ins = $this->conn->mysqli->prepare("INSERT INTO adsmst (adTitle, adQuality, adQuantity, adUnit, adPrice, adPhotos, adDesc, adTags, adType, adCondition, adUName, adMail, adPhone, adAddr, adCrDt, adPostBy) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?, ?, ? ,now() ,'".$_SESSION['UserId']."')");
-			$ins->bind_param("ssssisssssssss", $data['prd-title'], $data['prd-qlt'], $data['prd-qty'], $data['prd-unit'], $data['prd-price'], $photos , $data['prd-desc'], $data['tags'], $data['ad-type'], $data['prd-cond'], $data['prd-name'], $data['ctr-mail'], $data['prd-num'], $data['prd-addr']);
-			
+		$input=[
+			"user_id"=>$user_id,
+			"tic_subject"=>$tic_subject,
+			"tic_content"=>$tic_content,
+			"additonal_file"=>$additonal_file
+		];
 
-			if($ins->execute()){
-				$_SESSION['status']= 'Success';
-				$_SESSION['msg']   = 'Post uploaded Successfully..';
-				$arr['location']   = 'home.php';
-			}
-			else{
-				$_SESSION['status']= 'Failed';
-				$_SESSION['msg']   = 'Something Went Wrong..';
-				$arr['location']   = 'post-ad.php';
-			}
+		$data = $this->conn->filterPost($input); 
+
+		$ins = $this->conn->mysqli->prepare("INSERT INTO ghs_user_tickets (ghs_ticket_user_id, ghs_ticket_subject, ghs_ticket_content, ghs_ticket_attachement) VALUES (? ,? ,? ,? )");
+		$ins->bind_param("ssss", $data['user_id'], $data['tic_subject'], $data['tic_content'], $data['additonal_file']);
+		
+		if($ins->execute()){
+			$res=1;
+		}
+		else{
+			$res=0;
 		}
 
-		return $arr;
+		return $res;
 	}
 
 	public function adList($uId){
@@ -76,6 +53,8 @@ class AdClass extends DBController{
 	public function adFavList($uId){
 		$data = $this->conn->getArray("SELECT ad.*,user.UserName,user.UserId, uf.favId FROM userfav AS uf INNER JOIN adsmst AS ad ON uf.favUserId=".$uId." AND uf.favAdId=ad.adId INNER JOIN usermst AS user ON user.UserId=ad.adPostBy WHERE user.UserActive=1 AND ad.adActive='A' AND ad.adStatus='A' ORDER BY uf.favCrDt DESC");
 		return $data;
+
+		
 	}
 
 	public function myAds($uId){
@@ -106,11 +85,11 @@ class AdClass extends DBController{
 
 	public function setAddActiveD($id){
 		$id = $this->conn->filter($id); $data = 0;
-		$ins1 = $this->conn->mysqli->prepare("UPDATE adsmst SET adActive='D' WHERE adId=?");
 		$ins1->bind_param("i", $id);
 		if($ins1->execute()){
 			$data = 1;
 		}
+		$ins1 = $this->conn->mysqli->prepare("UPDATE adsmst SET adActive='D' WHERE adId=?");
 
 		return $data;
 	}
@@ -125,6 +104,8 @@ class AdClass extends DBController{
 
 		return $data;
 	}
+
+	
 
 
 } 

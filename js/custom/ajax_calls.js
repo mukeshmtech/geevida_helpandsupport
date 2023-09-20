@@ -21,6 +21,8 @@ $("#ghs_login_btn").on('click',function(ev){
             data: JSON.stringify(jsonData),
             success:function(response){
 
+                console.log(response);
+
                 if(response.data=="1")
                 {
                     $("#alertmsg").hide();
@@ -142,3 +144,42 @@ $("#ghs_reg_btn").on('click',function(ev){
 });
 
 
+//**********Post ticket FORM - API */
+$("#post_ticket_btn").on('click',function(ev){
+
+    ev.preventDefault();
+
+    var requestFormValidate=$("#submit-ticket-form").valid();
+
+    if(requestFormValidate){
+
+        var formData = new FormData(document.getElementById("submit-ticket-form"));
+
+        console.log("formData", formData);
+
+        $.ajax({
+            url:baseAPIUrl+'userPostTicketApi',
+            type:"POST",
+            data:formData,
+            contentType: false,
+            processData: false,
+            success:function(response){
+
+                try {
+                    var jsonResponse = JSON.parse(response);
+                    console.log(jsonResponse);
+                } catch (e) {
+                    console.log("Error parsing JSON response:", e);
+                }
+               
+            },
+            complete:function(){
+                $('.preloader').hide();
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX Error:", status, error);
+                console.log("Response:", xhr.responseText);
+            }
+        });
+    }
+});
