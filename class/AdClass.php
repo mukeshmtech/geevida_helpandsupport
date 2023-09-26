@@ -52,9 +52,7 @@ class AdClass extends DBController{
 
 	public function adFavList($uId){
 		$data = $this->conn->getArray("SELECT ad.*,user.UserName,user.UserId, uf.favId FROM userfav AS uf INNER JOIN adsmst AS ad ON uf.favUserId=".$uId." AND uf.favAdId=ad.adId INNER JOIN usermst AS user ON user.UserId=ad.adPostBy WHERE user.UserActive=1 AND ad.adActive='A' AND ad.adStatus='A' ORDER BY uf.favCrDt DESC");
-		return $data;
-
-		
+		return $data;		
 	}
 
 	public function myAds($uId){

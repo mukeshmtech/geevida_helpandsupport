@@ -111,6 +111,7 @@ function userPostTicketApi() {
 
     if(!empty($_FILES['additonal_file']))
     {
+        $attach_file='';
         $add_file = $_FILES['additonal_file']; 
         $filename1= date('Ymdhsi').'user'.$_POST['user_id'];
 
@@ -121,8 +122,11 @@ function userPostTicketApi() {
             
         if(move_uploaded_file($adTempName, '../uploads/'.$filename))
         {
-            $result = $postClass->creatTicket($_POST['user_id'],$_POST['tic_subject'],$_POST['tic_content'],$filename);
+            $attach_file=$filename;
         }
+
+        $result = $postClass->creatTicket($_POST['user_id'],$_POST['tic_subject'],$_POST['tic_content'],$attach_file);
+
     }	
 
     $response = ['status' => true, 'data' => $result, 'message' => "Ticket Added"];
